@@ -13,9 +13,9 @@ public final class NetworkKit {
     
     private init() { }
     
-    public func request<T: Codable>(_ absoluteURL: String, type: T.Type) async throws -> T {
+    public func request<T: Codable>(methodType: MethodType = .GET, _ absoluteURL: String, type: T.Type) async throws -> T {
         guard let url = URL(string: absoluteURL) else  { throw NetworkingError.invaildURL }
-        let request = URLRequest(url: url)
+        let request = buildRequest(from: url, methodType: methodType)
         let (data, response) = try await URLSession.shared.data(for: request)
         try validateResponse(response)
         do {
@@ -35,11 +35,15 @@ public final class NetworkKit {
     }
 }
 
-extension NetworkKit {
-    
-    enum NetworkingError: Error {
-        case invaildURL
-        case invaildStatusCode(statusCode: Int)
-        case failedToDecode(error: Error)
+private extension NetworkKit {
+    func buildRequest(from url: URL, methodType: MethodType) -> URLRequest {
+        var request = URLRequest(url: url)
+        switch methodType {
+        case .GET:
+            request.httpMethod = "GET"
+        case .POST:
+            request.httpMethod = "POST"
+        }
+        return request
     }
 }
