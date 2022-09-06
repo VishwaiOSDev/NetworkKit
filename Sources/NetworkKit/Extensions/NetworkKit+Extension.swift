@@ -10,6 +10,7 @@ import Foundation
 extension NetworkKit {
     enum NetworkingError: Error {
         case invaildURL
+        case custom(error: Error)
         case invaildStatusCode(statusCode: Int)
         case failedToDecode(error: Error)
     }

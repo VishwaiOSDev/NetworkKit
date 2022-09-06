@@ -16,11 +16,10 @@ public final class NetworkKit {
     public func request<T: Codable>(methodType: MethodType = .GET, _ absoluteURL: String, type: T.Type) async throws -> T {
         guard let url = URL(string: absoluteURL) else  { throw NetworkingError.invaildURL }
         let request = buildRequest(from: url, methodType: methodType)
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try validateResponse(response)
         do {
-            let decoder = JSONDecoder()
-            let JSONResponse = try decoder.decode(T.self, from: data)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try validateResponse(response)
+            let JSONResponse = try JSONDecoder().decode(T.self, from: data)
             return JSONResponse
         } catch {
             throw NetworkingError.failedToDecode(error: error)
@@ -28,9 +27,9 @@ public final class NetworkKit {
     }
     
     private func validateResponse(_ response: URLResponse) throws {
-        guard let response = response as? HTTPURLResponse, (200...300) ~= response.statusCode else {
-            let statusCode = (response as! HTTPURLResponse).statusCode
-            throw NetworkingError.invaildStatusCode(statusCode: statusCode)
+        guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+        guard (200...300) ~= response.statusCode else {
+            throw NetworkingError.invaildStatusCode(statusCode: response.statusCode)
         }
     }
 }
