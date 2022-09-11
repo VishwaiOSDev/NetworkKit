@@ -9,9 +9,16 @@ let package = Package(
     products: [
         .library(name: "NetworkKit", targets: ["NetworkKit"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "git@github.com:VishwaiOSDev/LogKit.git", .upToNextMajor(from: "0.0.9"))
+    ],
     targets: [
-        .target(name: "NetworkKit", dependencies: []),
+        .target(
+            name: "NetworkKit",
+            dependencies: [
+                .product(name: "LogKit", package: "LogKit")
+            ]
+        ),
         .testTarget(name: "NetworkKitTests", dependencies: ["NetworkKit"]),
     ]
 )

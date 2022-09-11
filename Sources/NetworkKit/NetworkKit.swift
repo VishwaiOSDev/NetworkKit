@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import LogKit
 
 public final class NetworkKit {
     
@@ -13,9 +14,9 @@ public final class NetworkKit {
     
     private init() { }
     
-    public func request<T: Codable>(methodType: MethodType = .GET, _ absoluteURL: String, type: T.Type) async throws -> T {
-        guard let url = URL(string: absoluteURL) else  { throw NetworkingError.invaildURL }
-        let request = buildRequest(from: url, methodType: methodType)
+    public func request<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T {
+        Log.debug(requestable)
+        let request = buildRequest(from: requestable.url, methodType: .GET)
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             try validateResponse(response)
