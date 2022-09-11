@@ -15,8 +15,8 @@ public final class NetworkKit {
     private init() { }
     
     public func request<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T {
-        Log.debug(requestable)
-        let request = buildRequest(from: requestable.url, methodType: .GET)
+        let url = requestable.url.addQueryParamIfNeeded(requestable.queryParameter)
+        let request = buildRequest(from: url, methodType: requestable.httpMethod)
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             try validateResponse(response)
@@ -36,14 +36,21 @@ public final class NetworkKit {
 }
 
 private extension NetworkKit {
-    func buildRequest(from url: URL, methodType: MethodType) -> URLRequest {
+    func buildRequest(from url: URL, methodType: HTTPMethod) -> URLRequest {
         var request = URLRequest(url: url)
-        switch methodType {
-        case .GET:
-            request.httpMethod = "GET"
-        case .POST:
-            request.httpMethod = "POST"
-        }
+        request.httpMethod = methodType.rawValue
         return request
+    }
+}
+
+extension URL {
+    func addQueryParamIfNeeded(_ queryParams: [String: Any]?) -> URL {
+        guard let queryParams = queryParams,
+              var urlComponents = URLComponents(string: absoluteString) else {
+            return absoluteURL
+        }
+        let queryItems = queryParams.map { URLQueryItem(name: $0, value: "\($1)") }
+        urlComponents.queryItems = queryItems
+        return urlComponents.url!
     }
 }
