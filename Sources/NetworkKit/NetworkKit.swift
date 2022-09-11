@@ -8,12 +8,12 @@
 import Foundation
 import LogKit
 
-protocol NetworkProtocol {
+protocol Networkable {
     func requestJSON<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T
     func requestData(_ requestable: NetworkRequestable) async throws -> Data
 }
 
-public final class NetworkKit: NetworkProtocol {
+public final class NetworkKit: Networkable {
     
     public static let shared = NetworkKit()
     
@@ -42,6 +42,15 @@ extension NetworkKit {
         let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
         return try await performNetworkRequest(URLRequest)
     }
+}
+
+extension NetworkKit {
+    
+    fileprivate func buildRequest(from url: URL, methodType: HTTPMethod) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = methodType.rawValue
+        return request
+    }
     
     fileprivate func performNetworkRequest(_ request: URLRequest) async throws -> Data {
         do {
@@ -58,9 +67,6 @@ extension NetworkKit {
             throw error
         }
     }
-}
-
-extension NetworkKit {
     
     fileprivate func decode<T>(_ data: Data, type: T.Type) -> T where T: Codable {
         do {
@@ -69,11 +75,5 @@ extension NetworkKit {
             Log.error(error)
             preconditionFailure("Failed to decode the data")
         }
-    }
-    
-    fileprivate func buildRequest(from url: URL, methodType: HTTPMethod) -> URLRequest {
-        var request = URLRequest(url: url)
-        request.httpMethod = methodType.rawValue
-        return request
     }
 }
