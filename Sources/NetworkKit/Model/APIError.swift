@@ -37,6 +37,7 @@ public enum NetworkError: LocalizedError {
     case undefined(error: APIError)
     case internalServerError(error: APIError)
     case noData
+    case invalidHost
     
     public var errorDescription: String? {
         switch self {
@@ -48,6 +49,7 @@ public enum NetworkError: LocalizedError {
         case .undefined(let error): return "[\(error.statusCode)]: undefined error"
         case .internalServerError(let error): return "[\(error.statusCode)]: internal server error"
         case .noData: return "no data"
+        case .invalidHost: return "Invaild Host"
         }
     }
 }

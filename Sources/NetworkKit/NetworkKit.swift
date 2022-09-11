@@ -29,14 +29,19 @@ extension NetworkKit {
     }
     
     fileprivate func performNetworkRequest(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else { throw NetworkError.noData }
-        guard (200...299) ~= httpResponse.statusCode else {
-            let error = APIError(statusCode: httpResponse.statusCode, data: data)
-            Log.error(error)
-            throw error.networkError
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else { throw NetworkError.noData }
+            guard (200...299) ~= httpResponse.statusCode else {
+                let error = APIError(statusCode: httpResponse.statusCode, data: data)
+                throw error.networkError
+            }
+            return data
+        } catch {
+            Log.error(error.localizedDescription)
+            guard let error = error as? NetworkError else { throw NetworkError.invalidHost }
+            throw error
         }
-        return data
     }
 }
 
