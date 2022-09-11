@@ -8,7 +8,12 @@
 import Foundation
 import LogKit
 
-public final class NetworkKit {
+protocol NetworkProtocol {
+    func requestJSON<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T
+    func requestData(_ requestable: NetworkRequestable) async throws -> Data
+}
+
+public final class NetworkKit: NetworkProtocol {
     
     public static let shared = NetworkKit()
     
@@ -16,6 +21,10 @@ public final class NetworkKit {
     
     public func requestJSON<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T {
         return try await processRequest(for: requestable, to: type)
+    }
+    
+    public func requestData(_ requestable: NetworkRequestable) async throws -> Data {
+        return try await processRequest(for: requestable)
     }
 }
 
@@ -26,6 +35,12 @@ extension NetworkKit {
         let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
+    }
+    
+    fileprivate func processRequest(for request: NetworkRequestable) async throws -> Data {
+        let url = request.url.addQueryParamIfNeeded(request.queryParameter)
+        let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
+        return try await performNetworkRequest(URLRequest)
     }
     
     fileprivate func performNetworkRequest(_ request: URLRequest) async throws -> Data {
