@@ -10,7 +10,7 @@ import Foundation
 public struct APIError: Error {
     
     public let statusCode: Int
-    public var data: Date?
+    public var data: Data?
     
     var networkError: NetworkError {
         switch statusCode {

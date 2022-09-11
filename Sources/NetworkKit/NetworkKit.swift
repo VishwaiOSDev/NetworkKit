@@ -23,26 +23,31 @@ extension NetworkKit {
     
     fileprivate func processRequest<T: Codable>(for request: NetworkRequestable, to type: T.Type) async throws -> T  {
         let url = request.url.addQueryParamIfNeeded(request.queryParameter)
-        let request = buildRequest(from: url, methodType: request.httpMethod)
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try validateResponse(response)
-            let JSONResponse = try JSONDecoder().decode(T.self, from: data)
-            return JSONResponse
-        } catch {
-            throw URLError(.badURL)
-//            throw NetworkingError.failedToDecode(error: error)
+        let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
+        let data = try await performNetworkRequest(URLRequest)
+        return decode(data, type: T.self)
+    }
+    
+    fileprivate func performNetworkRequest(_ request: URLRequest) async throws -> Data {
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else { throw NetworkError.noData }
+        guard (200...299) ~= httpResponse.statusCode else {
+            let error = APIError(statusCode: httpResponse.statusCode, data: data)
+            Log.error(error)
+            throw error.networkError
         }
+        return data
     }
 }
 
 extension NetworkKit {
     
-    fileprivate func validateResponse(_ response: URLResponse) throws {
-        guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        guard (200...299) ~= response.statusCode else {
-            throw URLError(.badURL)
-//            throw NetworkingError.invaildStatusCode(statusCode: response.statusCode)
+    fileprivate func decode<T>(_ data: Data, type: T.Type) -> T where T: Codable {
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            Log.error(error)
+            preconditionFailure("Failed to decode the data")
         }
     }
     
