@@ -48,7 +48,7 @@ public enum NetworkError: LocalizedError {
         case .badRequest(let error): return "[\(error.statusCode)]: bad request"
         case .undefined(let error): return "[\(error.statusCode)]: undefined error"
         case .internalServerError(let error): return "[\(error.statusCode)]: internal server error"
-        case .noData: return "no data"
+        case .noData: return "No Data"
         case .invalidHost: return "Invaild Host"
         }
     }

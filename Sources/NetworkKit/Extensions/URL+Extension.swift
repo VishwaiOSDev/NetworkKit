@@ -8,6 +8,7 @@
 import Foundation
 
 extension URL {
+    
     func addQueryParamIfNeeded(_ queryParams: [String: Any]?) -> URL {
         guard let queryParams = queryParams,
               var urlComponents = URLComponents(string: absoluteString) else {
