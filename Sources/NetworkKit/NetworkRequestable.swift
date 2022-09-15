@@ -9,7 +9,6 @@ import Foundation
 
 public protocol NetworkRequestable {
     var host: String { get } 
-    var url: URL { get }
     var path: String { get }
     var httpMethod: HTTPMethod { get }
     var queryParameter: [String: Any]? { get }

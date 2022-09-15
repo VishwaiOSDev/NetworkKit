@@ -9,8 +9,8 @@ import Foundation
 import LogKit
 
 protocol Networkable {
-    func requestJSON<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T
-    func requestData(_ requestable: NetworkRequestable) async throws -> Data
+    func requestJSON<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T
+    func requestData<Network: NetworkRequestable>(_ requestable: Network) async throws -> Data
 }
 
 public final class NetworkKit: Networkable {
@@ -19,32 +19,41 @@ public final class NetworkKit: Networkable {
     
     private init() { }
     
-    public func requestJSON<T: Codable>(_ requestable: NetworkRequestable, type: T.Type) async throws -> T {
+    public func requestJSON<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T {
         return try await processRequest(for: requestable, to: type)
     }
     
-    public func requestData(_ requestable: NetworkRequestable) async throws -> Data {
+    public func requestData<Network: NetworkRequestable>(_ requestable: Network) async throws -> Data {
         return try await processRequest(for: requestable)
     }
 }
 
 extension NetworkKit {
     
-    fileprivate func processRequest<T: Codable>(for request: NetworkRequestable, to type: T.Type) async throws -> T  {
-        let url = request.url.addQueryParamIfNeeded(request.queryParameter)
+    fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T  {
+        let url = try buildURL(for: request)
         let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
     }
     
     fileprivate func processRequest(for request: NetworkRequestable) async throws -> Data {
-        let url = request.url.addQueryParamIfNeeded(request.queryParameter)
+        let url = try buildURL(for: request)
         let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
         return try await performNetworkRequest(URLRequest)
     }
 }
 
 extension NetworkKit {
+    
+    internal func buildURL<Network: NetworkRequestable>(for requestable: Network) throws -> URL {
+        var urlComponent = URLComponents()
+        urlComponent.scheme = "https"
+        urlComponent.host = requestable.host
+        urlComponent.path = requestable.path
+        guard let url = urlComponent.url else { throw URLError(.badURL) }
+        return url.addQueryParamIfNeeded(requestable.queryParameter)
+    }
     
     fileprivate func buildRequest(from url: URL, methodType: HTTPMethod) -> URLRequest {
         var request = URLRequest(url: url)
