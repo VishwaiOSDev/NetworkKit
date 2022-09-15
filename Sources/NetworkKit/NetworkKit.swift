@@ -46,7 +46,7 @@ extension NetworkKit {
 
 extension NetworkKit {
     
-    fileprivate func buildURL<Network: NetworkRequestable>(for requestable: Network) throws -> URL {
+    internal func buildURL<Network: NetworkRequestable>(for requestable: Network) throws -> URL {
         var urlComponent = URLComponents()
         urlComponent.scheme = "https"
         urlComponent.host = requestable.host
