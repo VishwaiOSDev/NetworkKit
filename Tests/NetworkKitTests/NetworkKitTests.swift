@@ -15,6 +15,16 @@ final class NetworkKitTests: XCTestCase {
     
     override func tearDownWithError() throws { }
     
+    func testCheckEndpointConfiguration() {
+        let apiMock = APIMock.details
+        
+        XCTAssertEqual(apiMock.host, "api.loadify.app")
+        XCTAssertEqual(apiMock.httpMethod, .get)
+        XCTAssertEqual(apiMock.path, "/api/details")
+        XCTAssertEqual(apiMock.queryParameter, nil)
+        XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/details"))
+    }
+    
     func testURLConstruction() {
         do {
             let url = try NetworkKit.shared.buildURL(for: APIMock.download)
@@ -23,36 +33,5 @@ final class NetworkKitTests: XCTestCase {
         } catch {
             Log.error(error)
         }
-    }
-}
-
-enum APIMock {
-    case details, download
-}
-
-extension APIMock: NetworkRequestable {
-    
-    var host: String {
-        return "api.loadify.app"
-    }
-    
-    var path: String {
-        switch self {
-        case .details:
-            return "/api/details"
-        case .download:
-            return "/api/download"
-        }
-    }
-    
-    var httpMethod: HTTPMethod {
-        switch self {
-        case .details, .download:
-            return HTTPMethod.get
-        }
-    }
-    
-    var queryParameter: [String : Any]? {
-        return nil
     }
 }
