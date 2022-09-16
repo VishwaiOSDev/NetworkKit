@@ -31,29 +31,18 @@ public final class NetworkKit: Networkable {
 extension NetworkKit {
     
     fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T  {
-        let url = try buildURL(for: request)
-        let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
+        let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
     }
     
     fileprivate func processRequest(for request: NetworkRequestable) async throws -> Data {
-        let url = try buildURL(for: request)
-        let URLRequest = buildRequest(from: url, methodType: request.httpMethod)
+        let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         return try await performNetworkRequest(URLRequest)
     }
 }
 
 extension NetworkKit {
-    
-    internal func buildURL<Network: NetworkRequestable>(for requestable: Network) throws -> URL {
-        var urlComponent = URLComponents()
-        urlComponent.scheme = "https"
-        urlComponent.host = requestable.host
-        urlComponent.path = requestable.path
-        guard let url = urlComponent.url else { throw URLError(.badURL) }
-        return url.addQueryParamIfNeeded(requestable.queryParameter)
-    }
     
     fileprivate func buildRequest(from url: URL, methodType: HTTPMethod) -> URLRequest {
         var request = URLRequest(url: url)
