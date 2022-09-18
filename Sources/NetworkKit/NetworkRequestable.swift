@@ -16,7 +16,7 @@ public protocol NetworkRequestable {
 }
 
 /// Protocol Extension for constructing `URL`
-extension NetworkRequestable {
+public extension NetworkRequestable {
     
     var url: URL {
         get throws {

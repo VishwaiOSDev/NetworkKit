@@ -25,13 +25,13 @@ final class NetworkKitTests: XCTestCase {
         XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/details"))
     }
     
-    func testURLConstruction() {
-        do {
-            let url = try NetworkKit.shared.buildURL(for: APIMock.download)
-            
-            XCTAssertEqual(url, URL(string: "https://api.loadify.app/api/download")!)
-        } catch {
-            Log.error(error)
-        }
+    func testCheckEndpointConfigurationWithQueryParameters() {
+        let apiMock = APIMock.download
+        
+        XCTAssertEqual(apiMock.host, "api.loadify.app")
+        XCTAssertEqual(apiMock.httpMethod, .get)
+        XCTAssertEqual(apiMock.path, "/api/download")
+        XCTAssertEqual(apiMock.queryParameter, ["url": "https://www.youtube.com/watch?v=Y9bDQ1P8lZY"])
+        XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/download?url=https://www.youtube.com/watch?v%3DY9bDQ1P8lZY"))
     }
 }
