@@ -36,8 +36,10 @@ extension APIMock: NetworkRequestable {
     
     var queryParameter: [String : AnyHashable]? {
         switch self {
-        case .details, .download:
+        case .details:
             return nil
+        case .download:
+            return ["url": "https://www.youtube.com/watch?v=Y9bDQ1P8lZY"]
         }
     }
 }
