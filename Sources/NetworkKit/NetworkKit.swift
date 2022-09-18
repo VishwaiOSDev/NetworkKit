@@ -31,7 +31,6 @@ public final class NetworkKit: Networkable {
 extension NetworkKit {
     
     fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T  {
-        Log.verbose(try request.url)
         let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
