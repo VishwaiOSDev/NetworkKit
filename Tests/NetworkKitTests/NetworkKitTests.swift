@@ -34,4 +34,14 @@ final class NetworkKitTests: XCTestCase {
         XCTAssertEqual(apiMock.queryParameter, ["url": "https://www.youtube.com/watch?v=Y9bDQ1P8lZY"])
         XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/download?url=https://www.youtube.com/watch?v%3DY9bDQ1P8lZY"))
     }
+    
+    func testCheckEndpointConfigurationForPlaceholderAPI() {
+        let placeholderApiMock = PlaceholderAPIMock.post
+        
+        XCTAssertEqual(placeholderApiMock.host, "jsonplaceholder.typicode.com")
+        XCTAssertEqual(placeholderApiMock.httpMethod, .get)
+        XCTAssertEqual(placeholderApiMock.path, "/posts")
+        XCTAssertEqual(placeholderApiMock.queryParameter, nil)
+        XCTAssertEqual(try placeholderApiMock.url, URL(string: "https://jsonplaceholder.typicode.com/posts"))
+    }
 }
