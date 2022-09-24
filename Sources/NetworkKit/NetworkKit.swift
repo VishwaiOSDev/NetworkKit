@@ -9,7 +9,7 @@ import Foundation
 import LogKit
 
 protocol Networkable {
-    func requestJSON<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T
+    func requestCodable<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T
     func requestData<Network: NetworkRequestable>(_ requestable: Network) async throws -> Data
 }
 
@@ -19,7 +19,7 @@ public final class NetworkKit: Networkable {
     
     private init() { }
     
-    public func requestJSON<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T {
+    public func requestCodable<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T {
         return try await processRequest(for: requestable, to: type)
     }
     

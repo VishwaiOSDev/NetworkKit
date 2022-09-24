@@ -21,7 +21,7 @@ extension PlaceholderAPIMock: NetworkRequestable {
         case .post:
             return "/posts"
         case .comments:
-            return "/comments"
+            return "/commentsss"
         case .albums:
             return "/albums"
         case .photos:

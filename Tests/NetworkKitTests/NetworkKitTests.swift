@@ -9,31 +9,13 @@ import XCTest
 import LogKit
 @testable import NetworkKit
 
-final class NetworkKitTests: XCTestCase {
+class NetworkKitTests: XCTestCase {
     
-    override func setUpWithError() throws { }
+    var networkKit = NetworkKit.shared
     
-    override func tearDownWithError() throws { }
+    override func setUp() { }
     
-    func testCheckEndpointConfiguration() {
-        let apiMock = APIMock.details
-        
-        XCTAssertEqual(apiMock.host, "api.loadify.app")
-        XCTAssertEqual(apiMock.httpMethod, .get)
-        XCTAssertEqual(apiMock.path, "/api/details")
-        XCTAssertEqual(apiMock.queryParameter, nil)
-        XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/details"))
-    }
-    
-    func testCheckEndpointConfigurationWithQueryParameters() {
-        let apiMock = APIMock.download
-        
-        XCTAssertEqual(apiMock.host, "api.loadify.app")
-        XCTAssertEqual(apiMock.httpMethod, .get)
-        XCTAssertEqual(apiMock.path, "/api/download")
-        XCTAssertEqual(apiMock.queryParameter, ["url": "https://www.youtube.com/watch?v=Y9bDQ1P8lZY"])
-        XCTAssertEqual(try apiMock.url, URL(string: "https://api.loadify.app/api/download?url=https://www.youtube.com/watch?v%3DY9bDQ1P8lZY"))
-    }
+    override func tearDown() { }
     
     func testCheckEndpointConfigurationForPlaceholderAPI() {
         let placeholderApiMock = PlaceholderAPIMock.post
@@ -43,5 +25,45 @@ final class NetworkKitTests: XCTestCase {
         XCTAssertEqual(placeholderApiMock.path, "/posts")
         XCTAssertEqual(placeholderApiMock.queryParameter, nil)
         XCTAssertEqual(try placeholderApiMock.url, URL(string: "https://jsonplaceholder.typicode.com/posts"))
+    }
+}
+
+struct Post: Codable {
+    let userId: Int
+    let id: Int
+    let title: String
+    let body: String
+}
+
+final class NetworkingTest: NetworkKitTests {
+    
+    func testNetworkingHittingAPISuccess() async {
+        let placeholderAPI = PlaceholderAPIMock.post
+        
+        do {
+            let response = try await networkKit.requestCodable(placeholderAPI, type: [Post].self)
+            
+            XCTAssertNotNil(response)
+            XCTAssertEqual(response.count, 100)
+        } catch {
+            Log.error(error)
+        }
+    }
+    
+    func testNetworkingShouldThrowError() async {
+        let expectation = self.expectation(description: "failure without retry")
+        
+        /// Given API has an invaild path
+        let commentsAPI = PlaceholderAPIMock.comments
+        
+        do {
+            let response = try await networkKit.requestCodable(commentsAPI, type: [Post].self)
+            Log.verbose(response)
+        } catch {
+            Log.error(error)
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 1.0)
     }
 }
