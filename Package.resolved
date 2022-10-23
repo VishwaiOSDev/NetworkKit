@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "logkit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:VishwaiOSDev/LogKit.git",
+      "state" : {
+        "revision" : "87284a8a6378f753c0bdee7549b7fc325134421b",
+        "version" : "0.0.10"
+      }
+    }
+  ],
+  "version" : 2
+}
