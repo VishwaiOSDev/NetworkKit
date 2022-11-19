@@ -30,7 +30,7 @@ public final class NetworkKit: Networkable {
 
 extension NetworkKit {
     
-    fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T  {
+    fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T {
         let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
@@ -63,7 +63,9 @@ extension NetworkKit {
             }.value
         } catch {
             Log.error(error.localizedDescription)
-            guard let error = error as? NetworkError else { throw NetworkError.invalidHost }
+            guard let error = error as? NetworkError else {
+                throw NetworkError.invalidHost
+            }
             throw error
         }
     }
