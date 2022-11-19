@@ -57,11 +57,12 @@ final class NetworkingTest: NetworkKitTests {
         let commentsAPI = PlaceholderAPIMock.comments
         
         do {
-            let response = try await networkKit.requestCodable(commentsAPI, type: [Post].self)
-            Log.verbose(response)
+            let _ = try await networkKit.requestCodable(commentsAPI, type: [Post].self)
         } catch {
-            Log.error(error)
             expectation.fulfill()
+            let networkError = NetworkError.notFound(error: APIError(statusCode: 404, data: Data()))
+            let actualError = error as! NetworkError
+            XCTAssertEqual(actualError.errorDescription, networkError.errorDescription)
         }
         
         wait(for: [expectation], timeout: 1.0)
