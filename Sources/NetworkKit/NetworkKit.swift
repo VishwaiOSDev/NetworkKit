@@ -25,15 +25,13 @@ public final class NetworkKit: Networkable {
     public func requestCodable<T: Codable, Network: NetworkRequestable>(
         _ requestable: Network,
         type: T.Type
-    ) async throws -> T
-    {
+    ) async throws -> T {
         return try await processRequest(for: requestable, to: type)
     }
     
     public func requestData<Network: NetworkRequestable>(
         _ requestable: Network
-    ) async throws -> Data
-    {
+    ) async throws -> Data {
         return try await processRequest(for: requestable)
     }
 }
@@ -43,8 +41,7 @@ extension NetworkKit {
     fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(
         for request: Network,
         to type: T.Type
-    ) async throws -> T
-    {
+    ) async throws -> T {
         let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
