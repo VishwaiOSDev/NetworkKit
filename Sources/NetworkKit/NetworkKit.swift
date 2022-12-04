@@ -9,7 +9,10 @@ import Foundation
 import LogKit
 
 protocol Networkable {
-    func requestCodable<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T
+    func requestCodable<T: Codable, Network: NetworkRequestable>(
+        _ requestable: Network,
+        type: T.Type
+    ) async throws -> T
     func requestData<Network: NetworkRequestable>(_ requestable: Network) async throws -> Data
 }
 
@@ -17,20 +20,31 @@ public final class NetworkKit: Networkable {
     
     public static let shared = NetworkKit()
     
-    private init() { }
+    private init() {}
     
-    public func requestCodable<T: Codable, Network: NetworkRequestable>(_ requestable: Network, type: T.Type) async throws -> T {
+    public func requestCodable<T: Codable, Network: NetworkRequestable>(
+        _ requestable: Network,
+        type: T.Type
+    ) async throws -> T
+    {
         return try await processRequest(for: requestable, to: type)
     }
     
-    public func requestData<Network: NetworkRequestable>(_ requestable: Network) async throws -> Data {
+    public func requestData<Network: NetworkRequestable>(
+        _ requestable: Network
+    ) async throws -> Data
+    {
         return try await processRequest(for: requestable)
     }
 }
 
 extension NetworkKit {
     
-    fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(for request: Network, to type: T.Type) async throws -> T {
+    fileprivate func processRequest<T: Codable, Network: NetworkRequestable>(
+        for request: Network,
+        to type: T.Type
+    ) async throws -> T
+    {
         let URLRequest = buildRequest(from: try request.url, methodType: request.httpMethod)
         let data = try await performNetworkRequest(URLRequest)
         return decode(data, type: T.self)
@@ -54,7 +68,9 @@ extension NetworkKit {
         do {
             return try await Task.retrying {
                 let (data, response) = try await URLSession.shared.data(for: request)
-                guard let httpResponse = response as? HTTPURLResponse else { throw NetworkError.noData }
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw NetworkError.noData
+                }
                 guard (200...299) ~= httpResponse.statusCode else {
                     let error = APIError(statusCode: httpResponse.statusCode, data: data)
                     throw error.networkError
