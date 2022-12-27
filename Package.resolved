@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:VishwaiOSDev/LogKit.git",
       "state" : {
-        "revision" : "87284a8a6378f753c0bdee7549b7fc325134421b",
-        "version" : "0.0.10"
+        "revision" : "c67510d25a4d48dff0c078f9d62c9ecc0e66f21e",
+        "version" : "0.0.11"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
       "state" : {
-        "revision" : "db8dc515d0ba1bbcafc0fcbb6515035427c1ad95",
-        "version" : "0.1.0"
+        "revision" : "f69b412a765396d44dc9f4788a5b79919c1ca9e3",
+        "version" : "0.2.2"
       }
     }
   ],
