@@ -67,4 +67,16 @@ final class NetworkingTest: NetworkKitTests {
         
         wait(for: [expectation], timeout: 1.0)
     }
+    
+    func testPingRunningWebsite() async {
+        let placeholderAPI = PlaceholderAPIMock.post
+        let isReachable = await networkKit.ping(placeholderAPI)
+        XCTAssert(isReachable)
+    }
+    
+    func testPingNotRunningWebsite() async {
+        let commentsAPI = PlaceholderAPIMock.comments
+        let isReachable = await networkKit.ping(commentsAPI)
+        XCTAssertEqual(isReachable, false)
+    }
 }
