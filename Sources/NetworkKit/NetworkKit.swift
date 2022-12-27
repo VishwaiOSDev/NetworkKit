@@ -34,6 +34,19 @@ public final class NetworkKit: Networkable {
     ) async throws -> Data {
         return try await processRequest(for: requestable)
     }
+    
+    public func ping<Network: NetworkRequestable>(_ requestable: Network) async -> Bool {
+        do {
+            var URLRequest = buildRequest(from: try requestable.url, methodType: requestable.httpMethod)
+            URLRequest.timeoutInterval = 1.0
+            let (_, response) = try await URLSession.shared.data(for: URLRequest)
+            guard let httpResponse = response as? HTTPURLResponse, (200...299) ~= httpResponse.statusCode else { return false }
+            return true
+        } catch {
+            Log.error("Ping Error: \(error.localizedDescription)")
+            return false
+        }
+    }
 }
 
 extension NetworkKit {
