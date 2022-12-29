@@ -8,6 +8,10 @@
 import Foundation
 import LogKit
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 protocol Networkable {
     func requestCodable<T: Codable, Network: NetworkRequestable>(
         _ requestable: Network,
